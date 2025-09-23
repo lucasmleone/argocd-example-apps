@@ -1,51 +1,145 @@
-# ArgoCD Example Apps
+# Desafío 10 — ArgoCD en Kubernetes  
 
-This repository contains example applications for demoing ArgoCD functionality. Feel free
-to register this repository to your ArgoCD instance, or fork this repo and push your own commits
-to explore ArgoCD and GitOps!
+Este documento resume exactamente lo realizado:  
 
-| Status                                                                    | Application                                        | Description                                                                                                              |
-| ------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| [![App Status][badge_sync_example_apps]][app_sync_example_apps]           | [apps](apps/)                                      | An app composed of other apps synchronized in [cd.apps.argoproj.io][app_sync_example_apps]                               |
-| [![App Status][badge_blue_green]][app_blue_green]                         | [blue-green](blue-green/)                          | Demonstrates how to implement blue-green deployment using [Argo Rollouts](https://github.com/argoproj/argo-rollouts)     |
-| [![App Status][badge_guestbook]][app_guestbook]                           | [guestbook](guestbook/)                            | A hello word guestbook app as plain YAML                                                                                 |
-| [![App Status][badge_helm_dependency]][app_helm_dependency]               | [helm-dependency](helm-dependency/)                | Demonstrates how to customize an OTS (off-the-shelf) helm chart from an upstream repo                                    |
-| [![App Status][badge_helm_guestbook]][app_helm_guestbook]                 | [helm-guestbook](helm-guestbook/)                  | The guestbook app as a Helm chart                                                                                        |
-| [![App Status][badge_helm_hooks]][app_helm_hooks]                         | [helm-hooks](helm-hooks/)                          | An application with native Helm hooks                                                                                    |
-| [![App Status][badge_jsonnet_guestbook]][app_jsonnet_guestbook]           | [jsonnet-guestbook](jsonnet-guestbook/)            | The guestbook app as a raw jsonnet                                                                                       |
-| [![App Status][badge_jsonnet_guestbook_tla]][app_jsonnet_guestbook_tla]   | [jsonnet-guestbook-tla](jsonnet-guestbook-tla/)    | The guestbook app as a raw jsonnet with support for top level arguments                                                  |
-| [![App Status][badge_kustomize_guestbook]][app_kustomize_guestbook]       | [kustomize-guestbook](kustomize-guestbook/)        | The guestbook app as a Kustomize app                                                                                     |
-| [![App Status][badge_plugin_kasane]][app_plugin_kasane]                   | [plugins/kasane](plugins/kasane)                   | Apps which demonstrate config management plugins usage with [kasane](plugins/kasane/README.md)                           |
-| [![App Status][badge_plugin_kustomized_helm]][app_plugin_kustomized_helm] | [plugins/kustomized-helm](plugins/kustomized-helm) | Apps which demonstrate config management plugins usage with a [kustomized helm chart](plugins/kustomized-helm/README.md) |
-| [![App Status][badge_pre_post_sync]][app_pre_post_sync]                   | [pre-post-sync](pre-post-sync/)                    | Demonstrates Argo CD PreSync and PostSync hooks                                                                          |
-| [![App Status][badge_sock_shop]][app_sock_shop]                           | [sock-shop](sock-shop/)                            | A microservices demo app (https://microservices-demo.github.io)                                                          |
-| [![App Status][badge_sync_waves]][app_sync_waves]                         | [sync-waves](sync-waves/)                          | Demonstrates Argo CD sync waves with hooks                                                                               |
+● Instalación de **kubectl** en el entorno de desarrollo (Killerkoda).  
+● Creación del namespace `argocd`.  
+● Instalación de ArgoCD con el manifiesto oficial.  
+● Obtención de la contraseña inicial del usuario `admin`.  
+● Solución a la incidencia `ERR_TOO_MANY_REDIRECTS` en Killerkoda mediante parche de configuración y port-forward.  
+● Creación de una aplicación gestionada con ArgoCD a partir de un repositorio GitHub público.  
 
-[app_sync_example_apps]: https://cd.apps.argoproj.io/applications/sync-example-apps
-[badge_sync_example_apps]: https://cd.apps.argoproj.io/api/badge?revision=true&name=sync-example-apps
-[app_blue_green]: https://cd.apps.argoproj.io/applications/example.blue-green
-[badge_blue_green]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.blue-green
-[app_guestbook]: https://cd.apps.argoproj.io/applications/example.guestbook
-[badge_guestbook]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.guestbook
-[app_helm_dependency]: https://cd.apps.argoproj.io/applications/example.helm-dependency
-[badge_helm_dependency]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.helm-dependency
-[app_helm_guestbook]: https://cd.apps.argoproj.io/applications/example.helm-guestbook
-[badge_helm_guestbook]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.helm-guestbook
-[app_helm_hooks]: https://cd.apps.argoproj.io/applications/example.helm-hooks
-[badge_helm_hooks]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.helm-hooks
-[app_jsonnet_guestbook]: https://cd.apps.argoproj.io/applications/example.jsonnet-guestbook
-[badge_jsonnet_guestbook]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.jsonnet-guestbook
-[app_jsonnet_guestbook_tla]: https://cd.apps.argoproj.io/applications/example.jsonnet-guestbook-tla
-[badge_jsonnet_guestbook_tla]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.jsonnet-guestbook-tla
-[app_kustomize_guestbook]: https://cd.apps.argoproj.io/applications/example.kustomize-guestbook
-[badge_kustomize_guestbook]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.kustomize-guestbook
-[app_plugin_kasane]: https://cd.apps.argoproj.io/applications/example.plugin-kasane
-[badge_plugin_kasane]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.plugin-kasane
-[app_plugin_kustomized_helm]: https://cd.apps.argoproj.io/applications/example.plugin-kustomized-helm
-[badge_plugin_kustomized_helm]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.plugin-kustomized-helm
-[app_pre_post_sync]: https://cd.apps.argoproj.io/applications/example.pre-post-sync
-[badge_pre_post_sync]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.pre-post-sync
-[app_sock_shop]: https://cd.apps.argoproj.io/applications/example.sock-shop
-[badge_sock_shop]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.sock-shop
-[app_sync_waves]: https://cd.apps.argoproj.io/applications/example.sync-waves
-[badge_sync_waves]: https://cd.apps.argoproj.io/api/badge?revision=true&name=example.sync-waves
+---
+
+## Requisitos  
+
+● Entorno de Kubernetes (Killerkoda / Minikube / K3s).  
+● `kubectl` instalado.  
+● Repositorio en GitHub con la aplicación de ejemplo (`argocd-example-apps`).  
+
+---
+
+## 1) Instalación de ArgoCD  
+
+Crear el namespace:  
+```bash
+kubectl create namespace argocd
+```
+
+Instalar ArgoCD con el manifiesto oficial:  
+```bash
+kubectl apply \
+   --namespace argocd \
+   --filename https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+---
+
+## 2) Acceso inicial  
+
+Obtener la contraseña inicial del usuario `admin`:  
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+```
+
+Hacer un port-forward del servicio de ArgoCD:  
+```bash
+kubectl -n argocd port-forward svc/argocd-server 8080:443
+```
+
+Acceder al dashboard desde el navegador en `https://localhost:8080`.
+
+---
+
+## 3) Incidencia y solución en Killerkoda  
+
+Durante el acceso al dashboard apareció el error `ERR_TOO_MANY_REDIRECTS`.  
+Para solucionarlo:  
+
+Parchear el ConfigMap para habilitar modo inseguro:  
+```bash
+kubectl patch configmap argocd-cmd-params-cm -n argocd \
+  --type merge \
+  -p '{"data":{"server.insecure":"true"}}'
+```
+
+Reiniciar el deployment:  
+```bash
+kubectl rollout restart deployment argocd-server -n argocd
+```
+
+Exponer el servicio escuchando en todas las interfaces:  
+```bash
+kubectl port-forward --address 0.0.0.0 --namespace argocd svc/argocd-server 8080:80
+```
+
+Con esto el dashboard quedó accesible desde Killerkoda.
+
+---
+
+## 4) Creación de la aplicación gestionada  
+
+Se creó un manifiesto `argocd-deployment.yaml` con el siguiente contenido:  
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: example-deployment
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/lucasmleone/argocd-example-apps.git'
+    targetRevision: master
+    path: guestbook
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+```
+
+Aplicación en Kubernetes:  
+```bash
+kubectl apply -f argocd-deployment.yaml
+```
+
+Resultado: el **guestbook** quedó desplegado automáticamente en el cluster bajo gestión de ArgoCD.
+
+---
+
+## 5) Acceso y verificación  
+
+- Acceso al dashboard de ArgoCD: aplicación marcada como **Healthy** y **Synced**.  
+- Verificación de los pods:  
+```bash
+kubectl get pods -n default
+```
+- Logs disponibles desde el dashboard o vía `kubectl logs`.  
+
+---
+
+## Evidencias  
+
+#### Aplicación 
+![alt text](img/app.png)
+
+#### Dashboard de ArgoCD
+![alt text](img/argo.png)
+
+#### Pantalla de Login de ArgoCD!
+![alt text](img/Login.png)
+
+#### Terminal 
+![alt text](img/Terminal.png)
+
+---
+
+## Diagrama de alto nivel  
+
+![alt text](img/Diagrama.png)
